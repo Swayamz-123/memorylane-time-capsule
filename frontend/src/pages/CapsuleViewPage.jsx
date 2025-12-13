@@ -2,32 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MediaViewer from "../components/MediaViewer";
+import CollaboratorManager from "../components/CollaBoratorManager";
 
 const CapsuleViewPage = () => {
   const { id } = useParams();
-  const { API } = useAuth();
+  const { API, user } = useAuth();
 
   const [capsule, setCapsule] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchCapsule = async () => {
-      try {
-        const res = await API.get(`/capsules/${id}`);
-        console.log(res.data.data)
-        setCapsule(res.data.data);
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "Failed to load capsule"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchCapsule = async () => {
+    try {
+      const res = await API.get(`/capsules/${id}`);
+      setCapsule(res.data.data);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to load capsule");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchCapsule();
-  }, [API, id]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -45,9 +43,9 @@ const CapsuleViewPage = () => {
     );
   }
 
-  if (!capsule) {
-    return null;
-  }
+  if (!capsule) return null;
+
+  const isOwner = capsule.owner?._id === user?._id;
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -60,7 +58,6 @@ const CapsuleViewPage = () => {
               Theme: {capsule.theme}
             </p>
           </div>
-
           <span className="text-2xl">
             {capsule.isUnlocked ? "🔓" : "🔒"}
           </span>
@@ -68,9 +65,7 @@ const CapsuleViewPage = () => {
 
         {/* Description */}
         {capsule.description && (
-          <p className="text-gray-700 mb-4">
-            {capsule.description}
-          </p>
+          <p className="text-gray-700 mb-4">{capsule.description}</p>
         )}
 
         {/* Locked State */}
@@ -90,10 +85,7 @@ const CapsuleViewPage = () => {
           <>
             {/* Media */}
             <div className="mt-6">
-              <h2 className="text-lg font-semibold mb-3">
-                Memories
-              </h2>
-
+              <h2 className="text-lg font-semibold mb-3">Memories</h2>
               <div className="space-y-4">
                 {capsule.media?.map((item, index) => (
                   <MediaViewer key={index} media={item} />
@@ -101,7 +93,7 @@ const CapsuleViewPage = () => {
               </div>
             </div>
 
-            {/* AI Section (Backend-powered) */}
+            {/* AI Section */}
             <div className="mt-8">
               <h2 className="text-lg font-semibold mb-3">
                 AI Memory Assistant
@@ -112,7 +104,7 @@ const CapsuleViewPage = () => {
                   onClick={() =>
                     API.get(`/capsules/${id}/ai?type=summary`)
                   }
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
                 >
                   Generate Summary
                 </button>
@@ -121,7 +113,7 @@ const CapsuleViewPage = () => {
                   onClick={() =>
                     API.get(`/capsules/${id}/ai?type=caption`)
                   }
-                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  className="bg-green-600 text-white px-4 py-2 rounded"
                 >
                   Generate Caption
                 </button>
@@ -130,7 +122,7 @@ const CapsuleViewPage = () => {
                   onClick={() =>
                     API.get(`/capsules/${id}/ai?type=transcript`)
                   }
-                  className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+                  className="bg-purple-600 text-white px-4 py-2 rounded"
                 >
                   Transcribe Audio
                 </button>
@@ -140,6 +132,14 @@ const CapsuleViewPage = () => {
                 AI output is generated securely on the server.
               </p>
             </div>
+
+            {/* Collaborators (Owner Only) */}
+            {isOwner && (
+              <CollaboratorManager
+                capsuleId={capsule._id}
+                collaborators={capsule.collaborators}
+              />
+            )}
           </>
         )}
       </div>

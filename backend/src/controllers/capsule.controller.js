@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import User from "../models/user.model.js";
 const createCapsule = asyncHandler(async (req, res) => {
   const {
     title,
@@ -199,27 +200,44 @@ const unlockCapsuleByEvent = asyncHandler(async (req, res) => {
 
 const addCollaborator = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
-  const { collaboratorId } = req.body;
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Collaborator email is required");
+  }
 
   const capsule = await Capsule.findById(capsuleId);
-  if (!capsule) throw new ApiError(404, "Capsule not found");
+  if (!capsule) {
+    throw new ApiError(404, "Capsule not found");
+  }
 
+  // ✅ Only owner can add collaborators
   if (capsule.owner.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "Only owner can add collaborators");
   }
 
-  if (capsule.collaborators.includes(collaboratorId)) {
-    throw new ApiError(400, "User already a collaborator");
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, "User with this email does not exist");
   }
 
-  capsule.collaborators.push(collaboratorId);
+  // ❌ Prevent self-add
+  if (user._id.equals(capsule.owner)) {
+    throw new ApiError(400, "Owner is already a collaborator");
+  }
+
+  // ❌ Prevent duplicates
+  if (capsule.collaborators.some(id => id.equals(user._id))) {
+    throw new ApiError(400, "User is already a collaborator");
+  }
+
+  capsule.collaborators.push(user._id);
   await capsule.save();
 
   return res.status(200).json(
-    new ApiResponse(200, capsule, "Collaborator added successfully")
+    new ApiResponse(200, capsule.collaborators, "Collaborator added successfully")
   );
 });
-
 
 const removeCollaborator = asyncHandler(async (req, res) => {
   const { capsuleId, collaboratorId } = req.params;
