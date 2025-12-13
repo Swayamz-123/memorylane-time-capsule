@@ -1,0 +1,51 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import DashBoard from "./pages/Dashboard";
+import CreateCapsule from "./pages/CreateCapsule";
+import CapsuleViewPage from "./pages/CapsuleViewPage";
+import GuestRoute from "./components/GuestRoute";
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+           <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashBoard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/capsules/new"
+            element={
+              <ProtectedRoute>
+                <CreateCapsule />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/capsules/:id"
+            element={
+              <ProtectedRoute>
+                <CapsuleViewPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
