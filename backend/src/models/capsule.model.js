@@ -7,10 +7,9 @@ const mediaSchema = new Schema(
       enum: ["text", "image", "video", "audio"],
       required: true
     },
-    content: {
-      type: String,
-      required: true
-    }
+    content: String,
+    url: String,
+    publicId: String
   },
   { _id: false }
 );
@@ -46,13 +45,9 @@ const capsuleSchema = new Schema(
       required: true
     },
 
-    unlockDate: {
-      type: Date
-    },
+    unlockDate: Date,
 
-    unlockEvent: {
-      type: String
-    },
+    unlockEvent: String,
 
     isUnlocked: {
       type: Boolean,
