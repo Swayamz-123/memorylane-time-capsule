@@ -52,4 +52,50 @@ const createCapsule = asyncHandler(async (req, res) => {
     );
 });
 
-export { createCapsule };
+const getMyCapsules = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+  const userEmail = req.user.email;
+
+  const capsules = await Capsule.find({
+    $or: [
+      { owner: userId },
+      { collaborators: userId },
+      { recipients: userEmail }
+    ]
+  })
+    .populate("owner", "fullName email")
+    .sort({ createdAt: -1 });
+
+  const now = new Date();
+
+  const result = capsules.map((capsule) => {
+    let isUnlocked = capsule.isUnlocked;
+
+    if (
+      capsule.unlockType === "date" &&
+      capsule.unlockDate &&
+      capsule.unlockDate <= now
+    ) {
+      isUnlocked = true;
+    }
+
+    const countdown =
+      capsule.unlockType === "date" && capsule.unlockDate && !isUnlocked
+        ? capsule.unlockDate.getTime() - now.getTime()
+        : null;
+
+    return {
+      ...capsule.toObject(),
+      isUnlocked,
+      countdown
+    };
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, result, "My capsules fetched successfully")
+  );
+});
+
+
+
+export { createCapsule ,getMyCapsules};
