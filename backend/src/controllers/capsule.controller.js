@@ -123,26 +123,21 @@ const getMyCapsules = asyncHandler(async (req, res) => {
   );
 });
 
+import canViewCapsule from "../utils/canViewCapsule.js";
+
 const getCapsuleById = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
 
   const capsule = await Capsule.findById(capsuleId)
-    .populate("owner", "fullName email");
+    .populate("owner", "fullName email")
+    .populate("collaborators", "fullName email");
 
   if (!capsule) {
     throw new ApiError(404, "Capsule not found");
   }
 
-  const userId = req.user._id.toString();
-  const userEmail = req.user.email;
-
-  const isOwner = capsule.owner._id.toString() === userId;
-  const isCollaborator = capsule.collaborators.some(
-    (id) => id.toString() === userId
-  );
-  const isRecipient = capsule.recipients.includes(userEmail);
-
-  if (!isOwner && !isCollaborator && !isRecipient) {
+  // 🔐 Privacy enforcement
+  if (!canViewCapsule(capsule, req.user)) {
     throw new ApiError(403, "You are not allowed to view this capsule");
   }
 
@@ -171,6 +166,7 @@ const getCapsuleById = asyncHandler(async (req, res) => {
     new ApiResponse(200, capsule, "Capsule fetched successfully")
   );
 });
+
 
 const unlockCapsuleByEvent = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
@@ -340,6 +336,31 @@ const getCapsulesGroupedByTheme = asyncHandler(async (req, res) => {
   );
 });
 
+const updateCapsulePrivacy = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+  const { privacy } = req.body;
+
+  if (!["private", "shared"].includes(privacy)) {
+    throw new ApiError(400, "Invalid privacy value");
+  }
+
+  const capsule = await Capsule.findById(capsuleId);
+
+  if (!capsule) {
+    throw new ApiError(404, "Capsule not found");
+  }
+
+  if (capsule.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only owner can change privacy");
+  }
+
+  capsule.privacy = privacy;
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule, "Privacy updated successfully")
+  );
+});
 
 
 
@@ -354,6 +375,6 @@ export { createCapsule
   removeCollaborator,
 addMediaToCapsule,
 getCapsulesByTheme,
-getCapsulesGroupedByTheme
-
+getCapsulesGroupedByTheme,
+updateCapsulePrivacy
 };

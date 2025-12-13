@@ -71,7 +71,7 @@ const capsuleSchema = new Schema(
 
     privacy: {
       type: String,
-      enum: ["private", "shared"],
+      enum: ["private", "shared","public"],
       default: "private"
     },
 

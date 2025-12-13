@@ -5,7 +5,10 @@ import { upload } from "../middlewares/multer.middleware.js";
 import { getCapsuleById } from "../controllers/capsule.controller.js";
 import { unlockCapsuleByEvent } from "../controllers/capsule.controller.js";
 import { addCollaborator ,removeCollaborator,addMediaToCapsule} from "../controllers/capsule.controller.js";
-import { getCapsulesByTheme,getCapsulesGroupedByTheme } from "../controllers/capsule.controller.js";
+import { getCapsulesByTheme,getCapsulesGroupedByTheme,updateCapsulePrivacy } from "../controllers/capsule.controller.js";
+import { addComment } from "../controllers/comment.controller.js";
+import { addReflection } from "../controllers/reflection.controller.js";
+import { toggleReaction } from "../controllers/reaction.controller.js";
 const router = Router();
 
 router.post(
@@ -53,5 +56,34 @@ router.get(
   verifyJWT,
   getCapsulesGroupedByTheme
 );
+
+
+router.post(
+  "/:capsuleId/comments",
+  verifyJWT,
+  addComment
+);
+
+
+router.post(
+  "/:capsuleId/reactions",
+  verifyJWT,
+  toggleReaction
+);
+
+
+router.post(
+  "/:capsuleId/reflections",
+  verifyJWT,
+  addReflection
+);
+
+
+router.patch(
+  "/:capsuleId/privacy",
+  verifyJWT,
+  updateCapsulePrivacy
+);
+
 
 export default router;
