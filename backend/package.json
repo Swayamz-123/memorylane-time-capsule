@@ -1,16 +1,19 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "A backend project for hackathon orgainsed by PCON",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   } 
   ,
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "javascript",
+    "backend"
+  ],
+  "author": "Swayam Agarwal",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
