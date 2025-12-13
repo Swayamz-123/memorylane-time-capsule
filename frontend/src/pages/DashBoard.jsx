@@ -14,7 +14,6 @@ const Dashboard = () => {
     const fetchCapsules = async () => {
       try {
         const res = await API.get("/capsules");
-        console.log(res.data.data);
         
         setCapsules(res.data.data || []);
       } catch (err) {
