@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-const sendEmail = async ({ to, subject, text }) => {
+const sendEmail = async ({ to, subject, text, html }) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -15,7 +15,8 @@ const sendEmail = async ({ to, subject, text }) => {
     from: `"MemoryLane" <${process.env.EMAIL_USER}>`,
     to,
     subject,
-    text
+    text,
+    html
   });
 };
 

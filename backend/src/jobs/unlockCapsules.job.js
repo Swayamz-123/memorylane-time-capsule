@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import Capsule from "../models/capsule.model.js";
 import sendEmail from "../utils/sendEmail.js";
+import buildCapsuleEmailHTML from "../utils/capsuleEmailTemplate.js";
 
 const unlockCapsulesJob = () => {
   cron.schedule("*/1 * * * *", async () => {
@@ -23,23 +24,23 @@ const unlockCapsulesJob = () => {
         ];
 
         const subject = `🔓 Your Time Capsule "${capsule.title}" is Unlocked`;
-        const text = `
-Hi,
 
-Your time capsule "${capsule.title}" has just been unlocked 🎉
+        const html = buildCapsuleEmailHTML(capsule);
 
-Log in to MemoryLane to view your memories.
-
-— MemoryLane Team
-        `;
+        const text = `Your time capsule "${capsule.title}" has unlocked. Please open MemoryLane to view it.`;
 
         for (const email of emails) {
-          await sendEmail({ to: email, subject, text });
+          await sendEmail({
+            to: email,
+            subject,
+            text,
+            html
+          });
         }
       }
 
       if (capsulesToUnlock.length > 0) {
-        console.log(`📧 Emails sent for ${capsulesToUnlock.length} unlocked capsule(s)`);
+        console.log(`📧 Full capsule emails sent for ${capsulesToUnlock.length} capsule(s)`);
       }
     } catch (error) {
       console.error("❌ Unlock email job failed:", error);

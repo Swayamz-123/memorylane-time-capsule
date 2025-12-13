@@ -59,9 +59,7 @@ const createCapsule = asyncHandler(async (req, res) => {
     }
   }
 
-  if (media.length === 0) {
-    throw new ApiError(400, "At least one memory (text or media) is required");
-  }
+ 
 
   const capsule = await Capsule.create({
     title,
@@ -203,5 +201,159 @@ const unlockCapsuleByEvent = asyncHandler(async (req, res) => {
   );
 });
 
+const addCollaborator = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+  const { collaboratorId } = req.body;
 
-export { createCapsule ,getMyCapsules,getCapsuleById,unlockCapsuleByEvent};
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) throw new ApiError(404, "Capsule not found");
+
+  if (capsule.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only owner can add collaborators");
+  }
+
+  if (capsule.collaborators.includes(collaboratorId)) {
+    throw new ApiError(400, "User already a collaborator");
+  }
+
+  capsule.collaborators.push(collaboratorId);
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule, "Collaborator added successfully")
+  );
+});
+
+
+const removeCollaborator = asyncHandler(async (req, res) => {
+  const { capsuleId, collaboratorId } = req.params;
+
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) throw new ApiError(404, "Capsule not found");
+
+  if (capsule.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only owner can remove collaborators");
+  }
+
+  capsule.collaborators = capsule.collaborators.filter(
+    (id) => id.toString() !== collaboratorId
+  );
+
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule, "Collaborator removed successfully")
+  );
+});
+
+const addMediaToCapsule = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) throw new ApiError(404, "Capsule not found");
+
+  const userId = req.user._id.toString();
+
+  const isAllowed =
+    capsule.owner.toString() === userId ||
+    capsule.collaborators.some((id) => id.toString() === userId);
+
+  if (!isAllowed) {
+    throw new ApiError(403, "Not allowed to add media");
+  }
+
+  const media = [];
+
+  if (req.body.text) {
+    media.push({ type: "text", content: req.body.text });
+  }
+
+  if (req.files) {
+    for (const file of req.files) {
+      let mediaType = "image";
+      if (file.mimetype.startsWith("video")) mediaType = "video";
+      else if (file.mimetype.startsWith("audio")) mediaType = "audio";
+
+      const uploaded = await uploadToCloudinary(file.path, mediaType);
+
+      media.push({
+        type: mediaType,
+        url: uploaded.secure_url,
+        publicId: uploaded.public_id
+      });
+
+      fs.promises.unlink(file.path).catch(() => {});
+    }
+  }
+
+  capsule.media.push(...media);
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule, "Media added successfully")
+  );
+});
+
+const getCapsulesByTheme = asyncHandler(async (req, res) => {
+  const { theme } = req.params;
+
+  const capsules = await Capsule.find({
+    owner: req.user._id,
+    theme
+  }).sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(200, capsules, "Capsules fetched by theme")
+  );
+});
+
+const getCapsulesGroupedByTheme = asyncHandler(async (req, res) => {
+  const groupedCapsules = await Capsule.aggregate([
+    {
+      $match: {
+        owner: req.user._id
+      }
+    },
+    {
+      $group: {
+        _id: "$theme",
+        capsules: {
+          $push: {
+            _id: "$_id",
+            title: "$title",
+            isUnlocked: "$isUnlocked",
+            unlockDate: "$unlockDate",
+            createdAt: "$createdAt"
+          }
+        }
+      }
+    },
+    {
+      $sort: {
+        "_id": 1
+      }
+    }
+  ]);
+
+  return res.status(200).json(
+    new ApiResponse(200, groupedCapsules, "Capsules grouped by theme")
+  );
+});
+
+
+
+
+
+
+
+export { createCapsule 
+  ,getMyCapsules
+  ,getCapsuleById,
+  unlockCapsuleByEvent
+  ,addCollaborator,
+  removeCollaborator,
+addMediaToCapsule,
+getCapsulesByTheme,
+getCapsulesGroupedByTheme
+
+};
