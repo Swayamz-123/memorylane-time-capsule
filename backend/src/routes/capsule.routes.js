@@ -9,6 +9,7 @@ import { getCapsulesByTheme,getCapsulesGroupedByTheme,updateCapsulePrivacy } fro
 import { addComment } from "../controllers/comment.controller.js";
 import { addReflection } from "../controllers/reflection.controller.js";
 import { toggleReaction } from "../controllers/reaction.controller.js";
+import { generateAIResult } from "../controllers/ai.controller.js";
 const router = Router();
 
 router.post(
@@ -63,7 +64,10 @@ router.post(
   verifyJWT,
   addComment
 );
-
+router.get(
+  "/:capsuleId/ai",
+   verifyJWT,
+    generateAIResult);
 
 router.post(
   "/:capsuleId/reactions",
