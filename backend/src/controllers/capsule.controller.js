@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {canViewCapsule} from "../utils/canViewCapsule.js";
 import User from "../models/user.model.js";
 const createCapsule = asyncHandler(async (req, res) => {
   const {
@@ -85,10 +86,15 @@ const getMyCapsules = asyncHandler(async (req, res) => {
   const userEmail = req.user.email;
 
   const capsules = await Capsule.find({
-    $or: [
+   $or: [
+      // owner always sees own capsules
       { owner: userId },
-      { collaborators: userId },
-      { recipients: userEmail }
+
+      // collaborators only see capsules that are not private
+      { collaborators: userId, privacy: { $in: ["shared", "public"] } },
+
+      // recipients only see capsules that are not private
+      { recipients: userEmail, privacy: { $in: ["shared", "public"] } }
     ]
   })
     .populate("owner", "fullName email")
@@ -124,7 +130,6 @@ const getMyCapsules = asyncHandler(async (req, res) => {
   );
 });
 
-import canViewCapsule from "../utils/canViewCapsule.js";
 
 const getCapsuleById = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
@@ -155,6 +160,7 @@ const getCapsuleById = asyncHandler(async (req, res) => {
           collaborators:capsule.collaborators,
           recipients:capsule.recipients,
           owner:capsule.owner,
+          privacy:capsule.privacy,
           theme: capsule.theme,
           unlockType: capsule.unlockType,
           unlockDate: capsule.unlockDate,
@@ -422,7 +428,8 @@ const updateCapsulePrivacy = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
   const { privacy } = req.body;
 
-  if (!["private", "shared"].includes(privacy)) {
+  // allow all three
+  if (!["private", "shared", "public"].includes(privacy)) {
     throw new ApiError(400, "Invalid privacy value");
   }
 
@@ -439,12 +446,10 @@ const updateCapsulePrivacy = asyncHandler(async (req, res) => {
   capsule.privacy = privacy;
   await capsule.save();
 
-  return res.status(200).json(
-    new ApiResponse(200, capsule, "Privacy updated successfully")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, capsule, "Privacy updated successfully"));
 });
-
-
 
 
 

@@ -19,7 +19,7 @@ const CapsuleViewPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // NEW state
+  // interaction state
   const [comments, setComments] = useState([]);
   const [reflections, setReflections] = useState([]);
   const [reactions, setReactions] = useState([]);
@@ -38,7 +38,6 @@ const CapsuleViewPage = () => {
     }
   };
 
-  // NEW fetch for comments / reflections / reactions
   const fetchMeta = async () => {
     try {
       const [commentsRes, reflectionsRes, reactionsRes] = await Promise.all([
@@ -56,7 +55,6 @@ const CapsuleViewPage = () => {
       );
       setReactionType(mine ? mine.type : null);
     } catch (err) {
-      // keep capsule error handling as primary
       console.error("Failed to load capsule meta", err);
     }
   };
@@ -87,13 +85,14 @@ const CapsuleViewPage = () => {
   if (!capsule) return null;
 
   const isOwner = capsule.owner?._id === user?._id && capsule?.isUnlocked;
+  const isOwnerUser = capsule.owner?._id === user?._id;
   const canEdit = capsule.owner?._id === user?._id && !capsule?.isUnlocked;
   const canEventUnlock =
     capsule.owner?._id === user?._id &&
     !capsule.isUnlocked &&
     capsule.unlockType === "event";
 
-  // MEDIA CHECKS
+  // media checks
   const hasText = capsule.media?.some((m) => m.type === "text");
   const hasImage = capsule.media?.some((m) => m.type === "image");
   const hasAudio = capsule.media?.some((m) => m.type === "audio");
@@ -116,8 +115,6 @@ const CapsuleViewPage = () => {
 
     navigate(`/capsules/${id}/ai/${type}`);
   };
-
-  // NEW handlers wired to child components
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -173,6 +170,22 @@ const CapsuleViewPage = () => {
     }
   };
 
+  const handlePrivacyChange = async (e) => {
+    const value = e.target.value;
+    try {
+      const res = await API.patch(`/capsules/${capsule._id}/privacy`, {
+        privacy: value,
+      });
+      setCapsule((prev) => ({
+        ...prev,
+        privacy: res.data.data.privacy,
+      }));
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update privacy");
+    }
+  };
+  console.log(capsule.privacy)
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-6">
@@ -183,6 +196,22 @@ const CapsuleViewPage = () => {
             <p className="text-sm text-gray-500 capitalize">
               Theme: {capsule.theme}
             </p>
+
+            {/* Owner-only privacy control */}
+            {isOwnerUser && !capsule.isUnlocked && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-sm text-gray-500">Privacy:</span>
+                <select
+                  value={capsule.privacy}
+                  onChange={handlePrivacyChange}
+                  className="border rounded px-2 py-1 text-sm"
+                >
+                  <option value="private">Private</option>
+                  <option value="shared">Shared</option>
+                  <option value="public">Public</option>
+                </select>
+              </div>
+            )}
           </div>
           <span className="text-2xl">
             {capsule.isUnlocked ? "🔓" : "🔒"}
@@ -211,7 +240,7 @@ const CapsuleViewPage = () => {
                   onClick={async () => {
                     try {
                       await API.post(`/capsules/${capsule._id}/unlock`);
-                      fetchCapsule(); // refresh state
+                      fetchCapsule();
                       fetchMeta();
                     } catch (err) {
                       alert(
@@ -284,7 +313,7 @@ const CapsuleViewPage = () => {
               </div>
             </div>
 
-            {/* NEW: reactions / reflections / comments */}
+            {/* Reactions / Reflections / Comments */}
             <div className="mt-8 space-y-6">
               <CapsuleReactions
                 reactions={reactions}
