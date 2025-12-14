@@ -39,7 +39,9 @@ const CapsuleViewPage = () => {
 
   if (!capsule) return null;
 
-  const isOwner = capsule.owner?._id === user?._id;
+  const isOwner = capsule.owner?._id === user?._id && capsule?.isUnlocked
+   const canEdit = capsule.owner?._id === user?._id && !capsule?.isUnlocked
+  console.log(canEdit)
 
   // 🔐 MEDIA CHECKS
   const hasText = capsule.media?.some(m => m.type === "text");
@@ -92,14 +94,10 @@ const CapsuleViewPage = () => {
               </p>
             </div>
 
-            {isOwner && (
+            {canEdit && (
               <>
                 <CollaboratorManager capsuleId={capsule._id} collaborators={capsule.collaborators} />
-                <RecipientManager
-                  capsuleId={capsule._id}
-                  recipients={capsule.recipients}
-                  isUnlocked={false}
-                />
+               <RecipientManager  capsuleId={capsule._id}  recipients={capsule.recipients}/>
               </>
             )}
           </>

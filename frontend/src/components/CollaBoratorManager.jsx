@@ -1,20 +1,25 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-const CollaboratorManager = ({ capsuleId, collaborators }) => {
+const CollaboratorManager = ({ capsuleId, collaborators = [] }) => {
   const { API } = useAuth();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [localCollaborators, setLocalCollaborators] = useState(collaborators);
 
   const addCollaborator = async () => {
     if (!email.trim()) return;
 
     try {
       setLoading(true);
-      await API.post(`/capsules/${capsuleId}/collaborators`, {
+      const res = await API.post(`/capsules/${capsuleId}/collaborators`, {
         email
       });
-      window.location.reload();
+      
+      // ✅ CHANGED: Set directly, don't spread
+      setLocalCollaborators(res.data.data);
+      setEmail("");
+      
     } catch (err) {
       alert(err.response?.data?.message || "Failed to add collaborator");
     } finally {
@@ -27,7 +32,9 @@ const CollaboratorManager = ({ capsuleId, collaborators }) => {
       await API.delete(
         `/capsules/${capsuleId}/collaborators/${userId}`
       );
-      window.location.reload();
+      
+      setLocalCollaborators(localCollaborators.filter(u => u._id !== userId));
+      
     } catch (err) {
       alert("Failed to remove collaborator");
     }
@@ -50,20 +57,21 @@ const CollaboratorManager = ({ capsuleId, collaborators }) => {
           disabled={loading}
           className="bg-blue-600 text-white px-4 rounded"
         >
-          Add
+          {loading ? "Adding..." : "Add"}
         </button>
       </div>
 
-      <ul className="text-sm">
-        {collaborators.map((user) => (
+      <ul className="text-sm space-y-2">
+        {localCollaborators.map((user) => (
           <li
             key={user._id}
-            className="flex justify-between items-center"
+            className="flex justify-between items-center py-1"
           >
             <span>{user.email}</span>
+             <span>{user.fullName}</span>
             <button
               onClick={() => removeCollaborator(user._id)}
-              className="text-red-500 text-xs"
+              className="text-red-500 text-xs hover:text-red-700"
             >
               Remove
             </button>

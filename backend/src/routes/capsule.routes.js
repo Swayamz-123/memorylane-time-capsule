@@ -10,6 +10,8 @@ import { addComment } from "../controllers/comment.controller.js";
 import { addReflection } from "../controllers/reflection.controller.js";
 import { toggleReaction } from "../controllers/reaction.controller.js";
 import { generateAIResult } from "../controllers/ai.controller.js";
+import { addRecipient } from "../controllers/capsule.controller.js";
+import { removeRecipient } from "../controllers/capsule.controller.js";
 const router = Router();
 
 router.post(
@@ -37,6 +39,18 @@ router.delete(
   "/:capsuleId/collaborators/:collaboratorId",
   verifyJWT,
   removeCollaborator
+);
+router.post(
+  "/:capsuleId/recipients",
+  verifyJWT,
+  addRecipient
+);
+
+
+router.delete(
+  "/:capsuleId/recipients",
+  verifyJWT,
+  removeRecipient
 );
 router.post(
   "/:capsuleId/media",

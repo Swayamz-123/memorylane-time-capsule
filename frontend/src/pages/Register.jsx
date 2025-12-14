@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 
 
 function SignupPage() {
@@ -17,7 +17,7 @@ function SignupPage() {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault(); 
-        if (!fullName ||  !email || !password ) {
+        if (!fullName || !email || !password ) {
             setError("Please fill all required fields and upload an avatar.");
             return;
         }
@@ -25,13 +25,8 @@ function SignupPage() {
         setError('');
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append('fullName', fullName);
-        formData.append('email', email);
-        formData.append('password', password);
-
         try {
-            await register(formData); 
+            await register({ fullName, email, password }); 
             alert('Signup successful! You will now be redirected to the login page.');
             navigate('/login');
         } catch (err) {

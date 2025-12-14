@@ -132,6 +132,7 @@ const getCapsuleById = asyncHandler(async (req, res) => {
   const capsule = await Capsule.findById(capsuleId)
     .populate("owner", "fullName email")
     .populate("collaborators", "fullName email");
+    
 
   if (!capsule) {
     throw new ApiError(404, "Capsule not found");
@@ -151,6 +152,9 @@ const getCapsuleById = asyncHandler(async (req, res) => {
           _id: capsule._id,
           title: capsule.title,
           description: capsule.description,
+          collaborators:capsule.collaborators,
+          recipients:capsule.recipients,
+          owner:capsule.owner,
           theme: capsule.theme,
           unlockType: capsule.unlockType,
           unlockDate: capsule.unlockDate,
@@ -167,6 +171,7 @@ const getCapsuleById = asyncHandler(async (req, res) => {
     new ApiResponse(200, capsule, "Capsule fetched successfully")
   );
 });
+
 
 
 const unlockCapsuleByEvent = asyncHandler(async (req, res) => {
@@ -233,7 +238,7 @@ const addCollaborator = asyncHandler(async (req, res) => {
 
   capsule.collaborators.push(user._id);
   await capsule.save();
-
+    await capsule.populate('collaborators', 'email fullName');
   return res.status(200).json(
     new ApiResponse(200, capsule.collaborators, "Collaborator added successfully")
   );
@@ -260,6 +265,64 @@ const removeCollaborator = asyncHandler(async (req, res) => {
   );
 });
 
+const addRecipient = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+  const { email } = req.body;
+
+  if (!email) {
+    throw new ApiError(400, "Recipient email is required");
+  }
+
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) {
+    throw new ApiError(404, "Capsule not found");
+  }
+
+  // ✅ Only owner can add recipients
+  if (capsule.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only owner can add recipients");
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ApiError(400, "Invalid email format");
+  }
+
+  // ❌ Prevent duplicates
+  if (capsule.recipients.includes(email.toLowerCase().trim())) {
+    throw new ApiError(400, "Email is already a recipient");
+  }
+
+  capsule.recipients.push(email.toLowerCase().trim());
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule.recipients, "Recipient added successfully")
+  );
+});
+
+const removeRecipient = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+  const { email } = req.body; // Email in body, not params
+
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) throw new ApiError(404, "Capsule not found");
+
+  if (capsule.owner.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Only owner can remove recipients");
+  }
+
+  capsule.recipients = capsule.recipients.filter(
+    (recipientEmail) => recipientEmail !== email.toLowerCase().trim()
+  );
+
+  await capsule.save();
+
+  return res.status(200).json(
+    new ApiResponse(200, capsule.recipients, "Recipient removed successfully")
+  );
+});
 const addMediaToCapsule = asyncHandler(async (req, res) => {
   const { capsuleId } = req.params;
 
@@ -394,5 +457,7 @@ export { createCapsule
 addMediaToCapsule,
 getCapsulesByTheme,
 getCapsulesGroupedByTheme,
-updateCapsulePrivacy
+updateCapsulePrivacy,
+addRecipient,
+removeRecipient
 };
