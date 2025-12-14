@@ -16,7 +16,7 @@ const createCapsule = asyncHandler(async (req, res) => {
     unlockEvent,
     recipients,
     privacy,
-    text
+    text,
   } = req.body;
 
   if (!title || !unlockType) {
@@ -24,44 +24,36 @@ const createCapsule = asyncHandler(async (req, res) => {
   }
 
   if (unlockType === "date" && !unlockDate) {
-    throw new ApiError(400, "Unlock date is required for date-based capsules");
+    throw new ApiError(400, "Unlock date is required");
   }
 
   if (unlockType === "event" && !unlockEvent) {
-    throw new ApiError(400, "Unlock event is required for event-based capsules");
+    throw new ApiError(400, "Unlock event is required");
   }
 
   const media = [];
 
-  // ✅ TEXT MEMORY
-  if (text && text.trim() !== "") {
-    media.push({
-      type: "text",
-      content: text.trim()
-    });
+  // ✅ text media
+  if (text && text.trim()) {
+    media.push({ type: "text", content: text.trim() });
   }
 
-  // ✅ FILE MEDIA (IMAGE / AUDIO / VIDEO)
+  // ✅ file media
   if (req.files && req.files.length > 0) {
     for (const file of req.files) {
       let mediaType = "image";
-
       if (file.mimetype.startsWith("video")) mediaType = "video";
       else if (file.mimetype.startsWith("audio")) mediaType = "audio";
 
-      const uploaded = await uploadToCloudinary(file.path, mediaType);
+      const uploaded = await uploadToCloudinary(file.buffer);
 
       media.push({
         type: mediaType,
         url: uploaded.secure_url,
-        publicId: uploaded.public_id
+        publicId: uploaded.public_id,
       });
-
-     fs.promises.unlink(file.path).catch(() => {});
     }
   }
-
- 
 
   const capsule = await Capsule.create({
     title,
@@ -73,7 +65,7 @@ const createCapsule = asyncHandler(async (req, res) => {
     unlockEvent,
     recipients,
     privacy,
-    media
+    media,
   });
 
   return res
@@ -336,7 +328,6 @@ const addMediaToCapsule = asyncHandler(async (req, res) => {
   if (!capsule) throw new ApiError(404, "Capsule not found");
 
   const userId = req.user._id.toString();
-
   const isAllowed =
     capsule.owner.toString() === userId ||
     capsule.collaborators.some((id) => id.toString() === userId);
@@ -347,35 +338,34 @@ const addMediaToCapsule = asyncHandler(async (req, res) => {
 
   const media = [];
 
-  if (req.body.text) {
-    media.push({ type: "text", content: req.body.text });
+  if (req.body.text && req.body.text.trim()) {
+    media.push({ type: "text", content: req.body.text.trim() });
   }
 
-  if (req.files) {
+  if (req.files && req.files.length > 0) {
     for (const file of req.files) {
       let mediaType = "image";
       if (file.mimetype.startsWith("video")) mediaType = "video";
       else if (file.mimetype.startsWith("audio")) mediaType = "audio";
 
-      const uploaded = await uploadToCloudinary(file.path, mediaType);
+      const uploaded = await uploadToCloudinary(file.buffer);
 
       media.push({
         type: mediaType,
         url: uploaded.secure_url,
-        publicId: uploaded.public_id
+        publicId: uploaded.public_id,
       });
-
-      fs.promises.unlink(file.path).catch(() => {});
     }
   }
 
   capsule.media.push(...media);
   await capsule.save();
 
-  return res.status(200).json(
-    new ApiResponse(200, capsule, "Media added successfully")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, capsule, "Media added successfully"));
 });
+
 
 const getCapsulesByTheme = asyncHandler(async (req, res) => {
   const { theme } = req.params;
