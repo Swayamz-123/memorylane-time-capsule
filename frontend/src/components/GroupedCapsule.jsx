@@ -138,7 +138,7 @@ const GroupedCapsules = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style >{`
         @keyframes float-slow {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-25px) rotate(180deg); }
