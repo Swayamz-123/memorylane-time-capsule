@@ -109,7 +109,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { user: loggedInUser,accessToken,refreshToken},
+        { user: loggedInUser},
         "User logged in successfully"
       )
     );
@@ -137,47 +137,48 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken =
-    req.cookies.refreshToken || req.body.refreshToken;
+  const incomingRefreshToken = req.cookies.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(401, "Unauthorized request");
   }
 
-  try {
-    const decodedToken = jwt.verify(
-      incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+  const decodedToken = jwt.verify(
+    incomingRefreshToken,
+    process.env.REFRESH_TOKEN_SECRET
+  );
 
-    const user = await User.findById(decodedToken?._id);
+  const user = await User.findById(decodedToken._id);
 
-    if (!user || incomingRefreshToken !== user.refreshToken) {
-      throw new ApiError(401, "Invalid refresh token");
-    }
-
-    const { accessToken, refreshToken } =
-      await generateAccessandRefreshTokens(user._id);
-
-    const options = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production"
-    };
-
-    return res
-      .status(200)
-      .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
-      .json(
-        new ApiResponse(
-          200,
-          { accessToken, refreshToken },
-          "Access token refreshed"
-        )
-      );
-  } catch (error) {
+  if (!user || incomingRefreshToken !== user.refreshToken) {
     throw new ApiError(401, "Invalid refresh token");
   }
+
+  const { accessToken, refreshToken } =
+    await generateAccessandRefreshTokens(user._id);
+
+  const safeUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    path: "/",
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: safeUser },
+        "Access token refreshed"
+      )
+    );
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
