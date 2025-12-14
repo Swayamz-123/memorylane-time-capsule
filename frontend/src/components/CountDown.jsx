@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-const IST_OFFSET = 5.5 * 60 * 60 * 1000; // milliseconds
-
 const Countdown = ({ unlockDate }) => {
   const calculateTimeLeft = () => {
-    // Convert both times to IST
-    const nowIST = Date.now() + IST_OFFSET;
-    const unlockIST = new Date(unlockDate).getTime() + IST_OFFSET;
+    // Compare UTC vs UTC - no manual offsets
+    const now = Date.now(); // UTC timestamp
+    const unlock = new Date(unlockDate).getTime(); // UTC from DB
 
-    const diff = unlockIST - nowIST;
+    const diff = unlock - now;
 
     if (diff <= 0) {
       return null;
@@ -30,7 +28,7 @@ const Countdown = ({ unlockDate }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [unlockDate]);
+  }, []); // Empty deps - unlockDate is stable
 
   if (!timeLeft) {
     return (

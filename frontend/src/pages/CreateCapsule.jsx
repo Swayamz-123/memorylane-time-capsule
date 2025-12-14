@@ -34,7 +34,14 @@ const CreateCapsule = () => {
     formData.append("unlockType", unlockType);
 
     if (unlockType === "date") {
-      formData.append("unlockDate", unlockDate);
+      // Convert local datetime to UTC ISO string for DB storage
+      const localDate = new Date(unlockDate);
+      if (isNaN(localDate.getTime())) {
+        setError("Please select a valid unlock date and time");
+        return;
+      }
+      const utcDate = localDate.toISOString(); // Converts IST/local to UTC
+      formData.append("unlockDate", utcDate);
     }
 
     if (unlockType === "event") {
@@ -189,7 +196,11 @@ const CreateCapsule = () => {
                   className="w-full border border-purple-200 rounded-2xl px-3.5 py-2.5 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-400 bg-white/80"
                   value={unlockDate}
                   onChange={(e) => setUnlockDate(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)} // Prevents past dates
                 />
+                <p className="text-xs text-purple-600 mt-1">
+                  User selects local time (IST) → Automatically converted to UTC for storage
+                </p>
               </div>
             )}
 
