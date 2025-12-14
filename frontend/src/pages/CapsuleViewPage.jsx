@@ -53,7 +53,7 @@ const CapsuleViewPage = () => {
       );
       setReactionType(mine ? mine.type : null);
     } catch (err) {
-      console.error("Failed to load capsule meta", err);
+      //add error boundary
     }
   };
 

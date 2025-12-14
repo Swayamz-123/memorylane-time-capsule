@@ -10,11 +10,11 @@ connectDB()
 .then(()=>{
 
     app.listen(process.env.PORT || 8000,()=>{  
-        console.log(`Server is runnning at port : ${process.env.PORT}`);
+       
         unlockCapsulesJob();
     })
 })
 .catch((err)=>{
-    console.log("mongodb connection failed !!!" , err);
+   //error 
     
 })

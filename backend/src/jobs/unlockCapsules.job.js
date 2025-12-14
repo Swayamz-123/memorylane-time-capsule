@@ -39,11 +39,9 @@ const unlockCapsulesJob = () => {
         }
       }
 
-      if (capsulesToUnlock.length > 0) {
-        console.log(`📧 Full capsule emails sent for ${capsulesToUnlock.length} capsule(s)`);
-      }
+     
     } catch (error) {
-      console.error("❌ Unlock email job failed:", error);
+     //error
     }
   });
 };

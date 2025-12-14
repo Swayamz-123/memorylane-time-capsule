@@ -9,7 +9,6 @@ const LogoutButton = ({ className = "" }) => {
     try {
       await logout();
     } catch (error) {
-      console.error("Logout failed", error);
     } finally {
       navigate("/login");
     }

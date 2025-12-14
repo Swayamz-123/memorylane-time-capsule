@@ -28,7 +28,7 @@ function SignupPage() {
             navigate('/login');
         } catch (err) {
             setError(err.response?.data?.message || "Registration failed. Please try again.");
-            console.error("Signup failed:", err);
+           
         } finally {
             setLoading(false);
         }

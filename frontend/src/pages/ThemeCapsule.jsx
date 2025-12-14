@@ -15,7 +15,7 @@ const ThemeCapsulesPage = () => {
         const res = await API.get(`/capsules/theme/${theme}`);
         setCapsules(res.data.data);
       } catch (err) {
-        console.error("Failed to load theme capsules");
+       //error boundary required
       } finally {
         setLoading(false);
       }

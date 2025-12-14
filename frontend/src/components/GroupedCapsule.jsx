@@ -18,7 +18,6 @@ const GroupedCapsules = () => {
         const res = await API.get("/capsules/grouped/themes");
         setGroups(res.data.data);
       } catch (err) {
-        console.error("Failed to fetch grouped capsules:", err);
         setError("Failed to load capsules. Please try again.");
       } finally {
         setLoading(false);

@@ -384,7 +384,7 @@ const getCapsulesByTheme = asyncHandler(async (req, res) => {
     owner: req.user._id,
     theme
   }).sort({ createdAt: -1 });
-  console.log(capsules)
+  
 
   return res.status(200).json(
     new ApiResponse(200, capsules, "Capsules fetched by theme")

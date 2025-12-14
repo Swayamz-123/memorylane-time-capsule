@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
       requiresAuth: false,
       
     });
-    console.log(res)
+   
     setAccessToken(res.data.data.accessToken);
     setUser(res.data.data.user);
   };
