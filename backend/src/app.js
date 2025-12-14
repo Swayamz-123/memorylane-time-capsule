@@ -4,7 +4,7 @@ import cors from 'cors'
 import cookieParser from "cookie-parser"
 import userRouter from './routes/user.routes.js'
 import capsuleRoutes from "./routes/capsule.routes.js";
-
+import sendEmail from "./utils/sendEmail.js";
 
 const app = express()    
 app.use(cors({
