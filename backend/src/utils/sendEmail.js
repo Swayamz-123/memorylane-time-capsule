@@ -1,23 +1,39 @@
 import nodemailer from "nodemailer";
 
 const sendEmail = async ({ to, subject, text, html }) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false,
+  console.log("📧 Sending to:", to, "Subject:", subject.slice(0, 30));
+  
+  const transporter = nodemailer.createTransporter({
+    host: process.env.EMAIL_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: false, // true for 465, false for other ports
+    tls: {
+      rejectUnauthorized: false // Render SSL fix
+    },
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
     }
   });
 
-  await transporter.sendMail({
-    from: `"MemoryLane" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text,
-    html
-  });
+  try {
+    const result = await transporter.sendMail({
+      from: `"MemoryLane" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text,
+      html
+    });
+    console.log("✅ EMAIL SENT:", result.messageId);
+    return result;
+  } catch (error) {
+    console.error("❌ EMAIL ERROR:", {
+      code: error.code,
+      message: error.message,
+      response: error.response?.message
+    });
+    throw error;
+  }
 };
 
 export default sendEmail;
