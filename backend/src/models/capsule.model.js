@@ -35,7 +35,7 @@ const capsuleSchema = new Schema(
 
     theme: {
       type: String,
-      enum: ["childhood", "family", "college", "career", "other"],
+      enum: ["Childhood", "Family", "College", "Career", "Other"],
       default: "other"
     },
 

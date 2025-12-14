@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import CapsuleCard from "../components/CapsuleCard";
 import LogoutButton from "../components/LogoutButton";
-
+import GroupedCapsules from "../components/GroupedCapsule";
 const Dashboard = () => {
   const { API, user } = useAuth();
   const [capsules, setCapsules] = useState([]);
@@ -80,6 +80,7 @@ const Dashboard = () => {
           ))}
         </div>
       )}
+      <GroupedCapsules/>
     </div>
   );
 };

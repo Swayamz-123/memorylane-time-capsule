@@ -30,6 +30,7 @@ router.post(
 );
 
 router.post(
+  
   "/:capsuleId/collaborators",
   verifyJWT,
   addCollaborator

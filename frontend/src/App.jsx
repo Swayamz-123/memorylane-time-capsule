@@ -8,6 +8,7 @@ import DashBoard from "./pages/Dashboard";
 import CreateCapsule from "./pages/CreateCapsule";
 import CapsuleViewPage from "./pages/CapsuleViewPage";
 import GuestRoute from "./components/GuestRoute";
+import ThemeCapsulesPage from "./pages/ThemeCapsule";
 function App() {
   return (
     <AuthProvider>
@@ -33,6 +34,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+           <Route
+  path="/themes/:theme"
+  element={
+    <ProtectedRoute>
+      <ThemeCapsulesPage />
+    </ProtectedRoute>
+  }
+/>
 
 
           <Route
