@@ -17,5 +17,17 @@ app.use(express.static("public"))
 app.use(cookieParser())
 app.use("/api/v1/users",userRouter)
 app.use("/api/v1/capsules", capsuleRoutes);
+app.post('/api/test-email', async (req, res) => {
+  try {
+    await sendEmail({
+      to: 'itzswayam890@gmail.com',
+      subject: 'Test from Render',
+      text: 'If you see this, email works!'
+    });
+    res.json({ success: true });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
 
 export {app}
