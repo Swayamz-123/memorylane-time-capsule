@@ -34,35 +34,122 @@ function LoginPage() {
     };
 
     return (
-        <div className="form-container">
-            <form onSubmit={handleFormSubmit} className="auth-form">
-                <h2>Welcome Back!</h2>
-                
-                {error && <p className="error-message">{error}</p>}
-                
-                <input 
-                    type="email" 
-                    placeholder="Email"
-                    onChange={(e) => setEmail(e.target.value)}
-                    value={email}
-                />
-               
-                <input 
-                    type="password" 
-                    placeholder="Password"
-                    onChange={(e) => setPassword(e.target.value)}
-                    value={password}
-                    required
-                />
-                
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging In...' : 'Login'}
-                </button>
-                
-                <p className="redirect-link">
-                    Don't have an account? <Link to="/register">Sign Up</Link>
-                </p>
-            </form>
+        <div className="min-h-screen bg-linear-to-br from-amber-50 via-amber-100 to-orange-50 flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Floating memory particles */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-20 left-10 w-20 h-20 bg-amber-200/30 rounded-full blur-xl animate-float-slow"></div>
+                <div className="absolute top-1/2 right-20 w-32 h-32 bg-orange-200/40 rounded-full blur-2xl animate-float-medium delay-1000"></div>
+                <div className="absolute bottom-32 left-1/4 w-24 h-24 bg-amber-300/50 rounded-full blur-xl animate-float-fast delay-2000"></div>
+            </div>
+
+            <div className="w-full max-w-md relative z-10">
+                {/* Header Section */}
+                <div className="text-center mb-12 group">
+                    <div className="inline-block p-6 bg-linear-to-br from-amber-100 via-amber-200 to-orange-100 rounded-3xl shadow-2xl group-hover:scale-105 transition-all duration-700 hover:shadow-3xl mb-6 border border-amber-200/50 backdrop-blur-sm">
+                        <div className="relative">
+                            <svg className="w-16 h-16 text-amber-600 mx-auto mb-3 group-hover:scale-110 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                            <div className="absolute -inset-2 bg-linear-to-r from-amber-400/20 to-orange-400/20 rounded-3xl blur animate-pulse"></div>
+                        </div>
+                    </div>
+                    <h1 className="text-5xl font-black bg-linear-to-r from-amber-900 via-amber-800 to-orange-900 bg-clip-text text-transparent mb-3 leading-tight drop-shadow-lg">
+                        MemoryLane
+                    </h1>
+                    <p className="text-xl text-amber-700 font-light tracking-wide">Your digital time capsule ✨</p>
+                </div>
+
+                {/* Form Card */}
+                <div className="group relative bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-amber-200/40 hover:border-amber-300/60 p-10 hover:shadow-3xl transition-all duration-700 hover:-translate-y-2">
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-linear-to-r from-amber-400/10 via-orange-400/5 to-amber-400/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                    
+                    <h2 className="text-3xl font-black bg-linear-to-r from-amber-900 to-orange-900 bg-clip-text text-transparent mb-8 text-center relative z-10">
+                        Welcome Back!
+                    </h2>
+                    
+                    {error && (
+                        <div className="relative bg-linear-to-r from-red-50/90 to-rose-50/90 border  backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-lg border-l-8 border-red-400/60">
+                            <div className="absolute top-3 right-3 w-3 h-3 bg-red-400/80 rounded-full animate-ping"></div>
+                            <p className="text-red-800 font-semibold text-base leading-relaxed relative z-10">{error}</p>
+                        </div>
+                    )}
+                    
+                    <form onSubmit={handleFormSubmit} className="space-y-6 relative z-10">
+                        {/* Email Input */}
+                        <div className="relative">
+                            <label className="block text-sm font-bold text-amber-900 mb-3 tracking-wide">
+                                Email Address
+                            </label>
+                            <div className="relative">
+                                <input 
+                                    type="email" 
+                                    placeholder="Enter your email"
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={email}
+                                    className="w-full relative bg-white/60 border-2 border-amber-200/60 focus:border-amber-500 focus:ring-4 focus:ring-amber-200/40 p-5 rounded-2xl transition-all duration-500 outline-none backdrop-blur-sm hover:border-amber-300/80 font-semibold text-amber-900 placeholder-amber-500 hover:shadow-md shadow-sm"
+                                />
+                                <div className="absolute inset-0 bg-linear-to-r from-amber-400/10 to-orange-400/10 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
+                            </div>
+                        </div>
+                        
+                        {/* Password Input */}
+                        <div className="relative">
+                            <label className="block text-sm font-bold text-amber-900 mb-3 tracking-wide">
+                                Password
+                            </label>
+                            <div className="relative">
+                                <input 
+                                    type="password" 
+                                    placeholder="Enter your password"
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={password}
+                                    required
+                                    className="w-full relative bg-white/60 border-2 border-amber-200/60 focus:border-amber-500 focus:ring-4 focus:ring-amber-200/40 p-5 rounded-2xl transition-all duration-500 outline-none backdrop-blur-sm hover:border-amber-300/80 font-semibold text-amber-900 placeholder-amber-500 hover:shadow-md shadow-sm"
+                                />
+                                <div className="absolute inset-0 bg-linear-to-r from-amber-400/10 to-orange-400/10 rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"></div>
+                            </div>
+                        </div>
+                        
+                        {/* Submit Button */}
+                        <button 
+                            type="submit" 
+                            disabled={loading}
+                            className="group/btn relative w-full bg-linear-to-r from-amber-600 via-amber-500 to-orange-600 hover:from-amber-700 hover:via-amber-600 hover:to-orange-700 text-white px-8 py-5 rounded-2xl transition-all duration-500 font-bold text-lg shadow-2xl hover:shadow-3xl hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden mt-2"
+                        >
+                            <div className="absolute inset-0 bg-linear-to-r from-white/20 to-transparent -skew-x-12 -rotate-2 group-hover/btn:animate-shimmer pointer-events-none"></div>
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-3 relative z-10">
+                                    <div className="w-7 h-7 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    <span className="tracking-wide">Opening Memories...</span>
+                                </span>
+                            ) : (
+                                <span className="relative z-10 tracking-wide">Enter Time Capsule</span>
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Sign Up Link */}
+                    <div className="mt-8 pt-8 border-t border-amber-200/50 text-center relative z-10">
+                        <p className="text-amber-800 font-medium">
+                            Don't have an account?{' '}
+                            <Link 
+                                to="/register" 
+                                className="font-bold bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent hover:from-amber-700 hover:to-orange-700 transition-all duration-300 hover:underline relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-amber-500 after:transition-all after:duration-300 hover:after:w-full"
+                            >
+                                Create Yours ✨
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+
+                {/* Footer Text */}
+                <div className="text-center mt-12 relative z-10">
+                    <p className="text-amber-700 font-light text-lg tracking-wide drop-shadow-sm">
+                        Preserve your precious memories for tomorrow <span className="text-2xl">🕰️✨</span>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
