@@ -6,9 +6,9 @@ import { getCapsuleById } from "../controllers/capsule.controller.js";
 import { unlockCapsuleByEvent } from "../controllers/capsule.controller.js";
 import { addCollaborator ,removeCollaborator,addMediaToCapsule} from "../controllers/capsule.controller.js";
 import { getCapsulesByTheme,getCapsulesGroupedByTheme,updateCapsulePrivacy } from "../controllers/capsule.controller.js";
-import { addComment } from "../controllers/comment.controller.js";
-import { addReflection } from "../controllers/reflection.controller.js";
-import { toggleReaction } from "../controllers/reaction.controller.js";
+import { addComment,getComments } from "../controllers/comment.controller.js";
+import { addReflection ,getReflections} from "../controllers/reflection.controller.js";
+import { toggleReaction ,getReactions} from "../controllers/reaction.controller.js";
 import { generateAIResult } from "../controllers/ai.controller.js";
 import { addRecipient } from "../controllers/capsule.controller.js";
 import { removeRecipient } from "../controllers/capsule.controller.js";
@@ -74,30 +74,18 @@ router.get(
 );
 
 
-router.post(
-  "/:capsuleId/comments",
-  verifyJWT,
-  addComment
-);
 router.get(
   "/:capsuleId/ai",
    verifyJWT,
     generateAIResult);
+router.get("/:capsuleId/reactions", verifyJWT, getReactions);
+router.post("/:capsuleId/reactions", verifyJWT, toggleReaction);
 
-router.post(
-  "/:capsuleId/reactions",
-  verifyJWT,
-  toggleReaction
-);
+router.get("/:capsuleId/reflections", verifyJWT, getReflections);
+router.post("/:capsuleId/reflections", verifyJWT, addReflection);
 
-
-router.post(
-  "/:capsuleId/reflections",
-  verifyJWT,
-  addReflection
-);
-
-
+router.get("/:capsuleId/comments", verifyJWT, getComments);
+router.post("/:capsuleId/comments", verifyJWT, addComment);
 router.patch(
   "/:capsuleId/privacy",
   verifyJWT,

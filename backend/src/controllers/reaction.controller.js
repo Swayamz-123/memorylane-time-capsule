@@ -35,4 +35,24 @@ const toggleReaction = asyncHandler(async (req, res) => {
   res.json(new ApiResponse(200, reaction, "Reaction added"));
 });
 
-export { toggleReaction };
+// reaction.controller.js
+const getReactions = asyncHandler(async (req, res) => {
+  const { capsuleId } = req.params;
+
+  const capsule = await Capsule.findById(capsuleId);
+  if (!capsule) throw new ApiError(404, "Capsule not found");
+
+  if (!canInteract(capsule, req.user)) {
+    throw new ApiError(403, "Interaction not allowed");
+  }
+
+  const reactions = await Reaction
+    .find({ capsule: capsuleId })
+    .populate("user", "name email");
+
+  res.json(new ApiResponse(200, reactions, "Reactions fetched"));
+});
+
+export { toggleReaction, getReactions };
+
+
