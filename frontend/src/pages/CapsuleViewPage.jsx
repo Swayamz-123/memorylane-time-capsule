@@ -41,7 +41,11 @@ const CapsuleViewPage = () => {
 
   const isOwner = capsule.owner?._id === user?._id && capsule?.isUnlocked
    const canEdit = capsule.owner?._id === user?._id && !capsule?.isUnlocked
-  console.log(canEdit)
+ const canEventUnlock =
+  capsule.owner?._id === user?._id &&
+  !capsule.isUnlocked &&
+  capsule.unlockType === "event";
+
 
   // 🔐 MEDIA CHECKS
   const hasText = capsule.media?.some(m => m.type === "text");
@@ -93,6 +97,27 @@ const CapsuleViewPage = () => {
                 It will unlock automatically at the scheduled time.
               </p>
             </div>
+            {canEventUnlock && (
+  <div className="text-center mb-6">
+    <button
+      onClick={async () => {
+        try {
+          await API.post(`/capsules/${capsule._id}/unlock`);
+          fetchCapsule(); // refresh state
+        } catch (err) {
+          alert(
+            err.response?.data?.message ||
+            "Failed to unlock capsule"
+          );
+        }
+      }}
+      className="bg-purple-600 text-white px-5 py-2 rounded hover:bg-purple-700"
+    >
+      🎯 Mark Event as Completed & Unlock
+    </button>
+  </div>
+)}
+
 
             {canEdit && (
               <>

@@ -46,7 +46,7 @@ const CreateCapsule = () => {
     }
 
     for (let file of files) {
-      formData.append("files", file);
+      formData.append("media", file);
     }
 
     try {
