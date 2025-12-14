@@ -3,7 +3,7 @@ import { app } from "./app.js";
 import connectDB from "./db/index.js";
 import unlockCapsulesJob from "./jobs/unlockCapsules.job.js";
 dotenv.config({
-    path: './env'   
+    path: './.env'   
 })
 
 connectDB()
