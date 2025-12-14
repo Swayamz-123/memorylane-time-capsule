@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import AIResultPage from "./pages/ai/AiResultPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import DashBoard from "./pages/Dashboard";
@@ -34,6 +34,7 @@ function App() {
             }
           />
 
+
           <Route
             path="/capsules/:id"
             element={
@@ -42,6 +43,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/capsules/:id/ai/:type"
+  element={<ProtectedRoute><AIResultPage /></ProtectedRoute>}
+/>
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>
