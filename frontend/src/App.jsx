@@ -4,11 +4,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AIResultPage from "./pages/ai/AiResultPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import DashBoard from "./pages/Dashboard";
+import Dashboard from "./pages/DashBoard";
 import CreateCapsule from "./pages/CreateCapsule";
 import CapsuleViewPage from "./pages/CapsuleViewPage";
 import GuestRoute from "./components/GuestRoute";
 import ThemeCapsulesPage from "./pages/ThemeCapsule";
+import AddMediaPage from "./pages/AddMediaPage";
 function App() {
   return (
     <AuthProvider>
@@ -21,7 +22,15 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <DashBoard />
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/capsules/:id/media"
+            element={
+              <ProtectedRoute>
+                <AddMediaPage />
               </ProtectedRoute>
             }
           />

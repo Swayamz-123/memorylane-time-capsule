@@ -87,6 +87,9 @@ const CapsuleViewPage = () => {
   const isOwner = capsule.owner?._id === user?._id && capsule?.isUnlocked;
   const isOwnerUser = capsule.owner?._id === user?._id;
   const canEdit = capsule.owner?._id === user?._id && !capsule?.isUnlocked;
+  const isOwnerOrCollaborator =
+  capsule.owner?._id === user?._id ||
+  capsule.collaborators.some((c) => c._id === user?._id);
   const canEventUnlock =
     capsule.owner?._id === user?._id &&
     !capsule.isUnlocked &&
@@ -225,14 +228,32 @@ const CapsuleViewPage = () => {
         {/* LOCKED */}
         {!capsule.isUnlocked && (
           <>
-            <div className="border border-dashed border-gray-300 rounded p-6 text-center mb-6">
-              <p className="text-lg font-medium mb-2">
-                This capsule is locked
-              </p>
-              <p className="text-sm text-gray-600">
-                It will unlock automatically at the scheduled time.
-              </p>
-            </div>
+           <div className="border border-dashed border-gray-300 rounded p-6 text-center mb-6">
+  <p className="text-lg font-medium mb-2">
+    This capsule is locked
+  </p>
+
+  {capsule.unlockType === "date" && (
+    <p className="text-sm text-gray-600">
+      It will unlock automatically on{" "}
+      <span className="font-semibold">
+        {capsule.unlockDate
+          ? new Date(capsule.unlockDate).toLocaleString()
+          : "the scheduled date"}
+      </span>.
+    </p>
+  )}
+
+  {capsule.unlockType === "event" && (
+    <p className="text-sm text-gray-600">
+      It will unlock when this event happens:{" "}
+      <span className="font-semibold">
+        {capsule.unlockEvent || "Unnamed event"}
+      </span>.
+    </p>
+  )}
+</div>
+
 
             {canEventUnlock && (
               <div className="text-center mb-6">
@@ -251,6 +272,10 @@ const CapsuleViewPage = () => {
                   }}
                   className="bg-purple-600 text-white px-5 py-2 rounded hover:bg-purple-700"
                 >
+                  <span className="font-semibold">
+                   {capsule.unlockEvent || "Unnamed event"}
+                   </span>
+          
                   🎯 Mark Event as Completed & Unlock
                 </button>
               </div>
@@ -268,6 +293,17 @@ const CapsuleViewPage = () => {
                 />
               </>
             )}
+            {!capsule.isUnlocked && isOwnerOrCollaborator && (
+  <div className="mt-4 text-center">
+    <button
+      onClick={() => navigate(`/capsules/${capsule._id}/media`)}
+      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    >
+      + Add media
+    </button>
+  </div>
+)}
+
           </>
         )}
 
