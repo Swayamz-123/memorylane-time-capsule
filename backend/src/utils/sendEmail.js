@@ -1,22 +1,14 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const sendEmail = async ({ to, subject, text, html }) => {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
-  });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-  await transporter.sendMail({
-    from: `"MemoryLane" <${process.env.EMAIL_USER}>`,
+const sendEmail = async ({ to, subject,text, html }) => {
+  await resend.emails.send({
+    from: "MemoryLane <onboarding@resend.dev>",
     to,
     subject,
     text,
-    html
+    html,
   });
 };
 

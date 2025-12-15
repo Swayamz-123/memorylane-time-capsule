@@ -4,9 +4,9 @@
   "description": "A backend project for hackathon orgainsed by PCON",
   "main": "index.js",
   "scripts": {
-  "start": "node src/index.js",
-  "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
-},
+    "start": "node src/index.js",
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
+  },
   "keywords": [
     "javascript",
     "backend"
@@ -29,7 +29,8 @@
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.11",
-    "openai": "^6.10.0"
+    "openai": "^6.10.0",
+    "resend": "^6.6.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11",
