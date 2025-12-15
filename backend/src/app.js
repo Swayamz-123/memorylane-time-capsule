@@ -22,7 +22,8 @@ app.post('/api/test-email', async (req, res) => {
     await sendEmail({
       to: 'itzswayam890@gmail.com',
       subject: 'Test from Render',
-      text: 'If you see this, email works!'
+      text: 'If you see this, email works!',
+      html: "<h2>Email service is working 🚀</h2>"
     });
     res.json({ success: true });
   } catch (e) {
