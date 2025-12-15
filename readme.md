@@ -69,9 +69,9 @@ Multer (media uploads)
 
 Cloudinary (image/audio/video storage)
 
-Nodemailer (email notifications)
+Resend Email
 
-Node-cron (scheduled capsule unlocking)
+External cron(to keep calling cron route)
 
 OpenAI API
 
@@ -204,6 +204,39 @@ Node-cron (Scheduled Jobs)
    ↓
 OpenAI (AI Processing)
 
+## Routes
+### Capsule Routes
+POST    /api/v1/capsules -> To add capsule
+GET     /api/v1/capsules   -> To get my capsule
+GET     /api/v1/capsules/:capsuleId -> To get a particular capsule
+POST    /api/v1/capsules/:capsuleId/unlock -> To manually unlock on basis of event
+
+POST    /api/v1/capsules/:capsuleId/collaborators -> To add collaborators
+DELETE  /api/v1/capsules/:capsuleId/collaborators/:collaboratorId  -> To remove collaborators
+
+POST    /api/v1/capsules/:capsuleId/recipients  -> To add Recipients
+DELETE  /api/v1/capsules/:capsuleId/recipients  -> To remoove Recipients
+
+POST    /api/v1/capsules/:capsuleId/media  -> To add media
+GET     /api/v1/capsules/theme/:theme  -> To get capsule by particular theme
+GET     /api/v1/capsules/grouped/themes -> To group capsule on basis of theme
+GET     /api/v1/capsules/:capsuleId/ai   -> To get ai response
+GET     /api/v1/capsules/:capsuleId/reactions  -> To get reactions upon capsule
+POST    /api/v1/capsules/:capsuleId/reactions  ->To  react upon capsule
+GET     /api/v1/capsules/:capsuleId/reflections -> To get reactions upon capsule
+POST    /api/v1/capsules/:capsuleId/reflections  ->To  react upon capsule
+GET     /api/v1/capsules/:capsuleId/comments  -> To get reactions upon capsule
+POST    /api/v1/capsules/:capsuleId/comments   ->To  react upon capsule
+PATCH   /api/v1/capsules/:capsuleId/privacy   -> To toggle the privacy
+### User Routes
+POST    /api/v1/users/register  ->  To register User
+POST    /api/v1/users/login  -> To login User
+POST    /api/v1/users/logout   -> To logout User
+POST    /api/v1/users/refresh-token  -> To refresh access token
+GET     /api/v1/users/current-user -> To get current user
+
+### Cron Routes
+GET     /api/v1/cron/unlock-capsules  -> To unlcok the capsule
 
 ## 🔒 Security & Privacy
 
@@ -218,6 +251,9 @@ OpenAI (AI Processing)
 
 Built by: Swayam
 A full-stack web developer passionate about scalable systems, meaningful UX, and AI-powered applications.
+## Instructions 
+Difference between the locked and unlock time should be atleast 5 minuutes to let work cron properly.
+Like if date is 15:12:2025 and current time is 11:56 am then set Unlock time to 12:01 for the same date
 
 ## 📜 License
 This project is built for learning, demonstration, and hackathon purposes.
