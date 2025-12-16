@@ -196,8 +196,7 @@ AI-powered features, and strict access control.
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/29738fe9-444c-40ed-918e-179f08034328" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/bc755154-af2e-4a62-bb2c-b46c93e2f035" />
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/89ee67d7-cf9f-446d-83f5-0285432096bd" />
-
-
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2cc4aa47-2ae9-48f2-a16e-95b7a619865e" />
 
 ## Architecture Diagram
 Frontend (React)
